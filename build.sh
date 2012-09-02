@@ -29,6 +29,11 @@ cd $BUILD_DIR
 ../fetchurl "http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz?use_mirror=auto"
 ../fetchurl "http://www.ffmpeg.org/releases/ffmpeg-0.10.2.tar.gz"
 
+#fribidi
+../fetchurl "http://fribidi.org/download/fribidi-0.19.4.tar.bz2"
+#libass
+../fetchurl "http://libass.googlecode.com/files/libass-0.10.0.tar.gz"
+
 echo "*** Building yasm ***"
 cd "$BUILD_DIR/yasm-1.2.0"
 ./configure --prefix=$TARGET_DIR
@@ -96,6 +101,20 @@ cd "$BUILD_DIR/lame-3.99.5"
 ./configure --prefix=$TARGET_DIR --enable-static --disable-shared
 make -j 4 && make install
 
+#fribidi
+echo "*** Building fribidi ***"
+cd "$BUILD_DIR/fribidi-0.19.4"
+./configure --prefix=$TARGET_DIR --enable-static --disable-shared
+make -j 4 && make install
+
+#libass
+echo "*** Building libass ***"
+cd "$BUILD_DIR/libass-0.10.0"
+PKG_CONFIG_PATH=$TARGET_DIR/lib/pkgconfig/
+export PKG_CONFIG_PATH
+./configure --prefix=$TARGET_DIR --enable-static --disable-shared
+make -j 4 && make install
+
 # FIXME: only OS-sepcific
 rm -f "$TARGET_DIR/lib/*.dylib"
 rm -f "$TARGET_DIR/lib/*.so"
@@ -104,6 +123,6 @@ rm -f "$TARGET_DIR/lib/*.so"
 echo "*** Building FFmpeg ***"
 cd "$BUILD_DIR/ffmpeg-0.10.2"
 patch -p1 <../../ffmpeg_config.patch
-CFLAGS="-I$TARGET_DIR/include" LDFLAGS="-L$TARGET_DIR/lib -lm" ./configure --prefix=${OUTPUT_DIR:-$TARGET_DIR} --extra-version=static --disable-debug --disable-shared --enable-static --extra-cflags=--static --disable-ffplay --disable-ffserver --disable-doc --enable-gpl --enable-pthreads --enable-postproc --enable-gray --enable-runtime-cpudetect --enable-libfaac --enable-libmp3lame --enable-libtheora --enable-libvorbis --enable-libx264 --enable-libxvid --enable-bzlib --enable-zlib --enable-nonfree --enable-version3 --enable-libvpx --disable-devices
+CFLAGS="-I$TARGET_DIR/include" LDFLAGS="-L$TARGET_DIR/lib -lm" ./configure --prefix=${OUTPUT_DIR:-$TARGET_DIR} --extra-version=static --disable-debug --disable-shared --enable-static --extra-cflags=--static --disable-ffplay --disable-ffserver --disable-doc --enable-gpl --enable-pthreads --enable-postproc --enable-gray --enable-runtime-cpudetect --enable-libfaac --enable-libmp3lame --enable-libtheora --enable-libvorbis --enable-libx264 --enable-libxvid --enable-bzlib --enable-zlib --enable-nonfree --enable-version3 --enable-libvpx --disable-devices --enable-libass
 make -j 4 && make install
 
